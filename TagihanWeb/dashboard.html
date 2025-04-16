@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bills Reminder - Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+        
+        .navbar {
+            background-color: #0d6efd;
+            padding: 10px 20px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .summary-card {
+            background-color: #f8f9fa;
+            border-left: 5px solid #0d6efd;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .bill-item, .payment-item, .wallet-item {
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bill-item.overdue {
+            border-left: 5px solid #dc3545;
+        }
+        
+        .bill-item.due-soon {
+            border-left: 5px solid #ffc107;
+        }
+        
+        .bill-item.paid {
+            border-left: 5px solid #198754;
+        }
+        
+        .payment-item {
+            border-left: 5px solid #198754;
+        }
+        
+        .wallet-item {
+            border-left: 5px solid #0d6efd;
+        }
+        
+        .stats-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+        }
+        
+        footer {
+            background-color: #0d6efd;
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .container-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Notification styles */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc3545;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Bootstrap -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">Bills Reminder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="tagihanDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tagihan
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="tagihanDropdown">
+                            <li><a class="dropdown-item" href="tambah-tagihan.html">Tambah Tagihan</a></li>
+                            <li><a class="dropdown-item" href="daftar-tagihan.html">Daftar Tagihan</a></li>
+                            <li><a class="dropdown-item" href="kalendertagihan.html">Kalender Tagihan</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="keuanganDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Keuangan
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="keuanganDropdown">
+                            <li><a class="dropdown-item" href="add-wallet.html">Add Wallet</a></li>
+                            <li><a class="dropdown-item" href="wallets.html">My Wallets</a></li>
+                            <li><a class="dropdown-item" href="pemasukan.html">Pemasukan</a></li>
+                            <li><a class="dropdown-item" href="pengeluaran.html">Pengeluaran</a></li>
+                            <li><a class="dropdown-item" href="grafik-statistik.html">Grafik & Statistik</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="customer-service.html">Customer Service</a>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="notifications.html" id="notificationBell" title="Notifikasi">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h2 class="mb-4">Dashboard</h2>
+        
+        <!-- Summary Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stats-number">Rp <span id="totalOutstanding">0</span></div>
+                        <div class="stats-label">Total Outstanding Bills</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stats-number"><span id="billsThisWeek">0</span></div>
+                        <div class="stats-label">Bills Due This Week</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stats-number">Rp <span id="totalWalletBalance">0</span></div>
+                        <div class="stats-label">Total Balance in Wallets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Upcoming Bills -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Upcoming Bills</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="upcomingBills">
+                            <!-- Upcoming bills will be dynamically loaded here -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="daftar-tagihan.html" class="btn btn-outline-primary">View All Bills</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Payments -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Payments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentPayments">
+                            <!-- Recent payments will be dynamically loaded here -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="pengeluaran.html" class="btn btn-outline-primary">View All Payments</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wallets Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Wallets</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="walletsList">
+                            <!-- Wallets will be dynamically loaded here -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="add-wallet.html" class="btn btn-outline-primary">Add New Wallet</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 col-md-3 text-center mb-3">
+                                <a href="tambah-tagihan.html" class="btn btn-outline-primary d-block">
+                                    <i class="fas fa-plus-circle mb-2 fa-2x"></i>
+                                    <br>Add New Bill
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3 text-center mb-3">
+                                <a href="pemasukan.html" class="btn btn-outline-success d-block">
+                                    <i class="fas fa-arrow-down mb-2 fa-2x"></i>
+                                    <br>Record Income
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3 text-center mb-3">
+                                <a href="pengeluaran.html" class="btn btn-outline-danger d-block">
+                                    <i class="fas fa-arrow-up mb-2 fa-2x"></i>
+                                    <br>Record Expense
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3 text-center mb-3">
+                                <a href="grafik-statistik.html" class="btn btn-outline-info d-block">
+                                    <i class="fas fa-chart-line mb-2 fa-2x"></i>
+                                    <br>View Reports
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-footer">
+            <h5>Hubungi Kami :</h5>
+            <p>
+                <i class="fas fa-phone"></i> +62 82164642828 (WhatsApp Only)<br>
+                <i class="fas fa-envelope"></i> support@billreminder.id<br>
+                <i class="fas fa-map-marker-alt"></i> UNIVERSITAS PELITA HARAPAN<br>
+                Lippo Plaza Medan, Jl. Imam Bonjol No.6 Lantai 5 - 7, Petisah Tengah, Medan Petisah, Medan City, North Sumatra 20112
+            </p>
+            <p>
+                <a href="https://wa.me/6282164642828" class="footer-link" target="_blank">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Load bills from localStorage
+        const bills = JSON.parse(localStorage.getItem('bills')) || [];
+        
+        // Load wallets from localStorage
+        const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+        
+        // Load incomes from localStorage
+        const incomes = JSON.parse(localStorage.getItem('incomes')) || [];
+        
+        // Load expenses from localStorage
+        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        
+        // Function to render upcoming bills
+        function renderUpcomingBills() {
+            const upcomingBillsContainer = document.getElementById('upcomingBills');
+            upcomingBillsContainer.innerHTML = '';
+            
+            // Filter bills that are upcoming (not paid and due date is in the future)
+            const upcomingBills = bills.filter(bill => 
+                bill.status !== 'Sudah Dibayar' && 
+                new Date(bill.jatuhTempo) >= new Date()
+            ).sort((a, b) => new Date(a.jatuhTempo) - new Date(b.jatuhTempo));
+            
+            if (upcomingBills.length === 0) {
+                upcomingBillsContainer.innerHTML = '<p class="text-center">Tidak ada tagihan yang akan datang.</p>';
+                return;
+            }
+            
+            upcomingBills.forEach(bill => {
+                const billElement = document.createElement('div');
+                billElement.classList.add('bill-item');
+                if (bill.status === 'Terlambat') {
+                    billElement.classList.add('overdue');
+                } else if (bill.status === 'Sudah Dibayar') {
+                    billElement.classList.add('paid');
+                } else {
+                    billElement.classList.add('due-soon');
+                }
+                
+                billElement.innerHTML = `
+                    <div class="bill-info">
+                        <h6>${bill.nama}</h6>
+                        <p class="mb-0">Jatuh Tempo: ${new Date(bill.jatuhTempo).toLocaleDateString('id-ID')}</p>
+                    </div>
+                    <div class="bill-amount">
+                        <h6>Rp ${bill.jumlah}</h6>
+                        <span class="badge bg-${bill.status === 'Sudah Dibayar' ? 'success' : bill.status === 'Terlambat' ? 'danger' : 'primary'}">${bill.status}</span>
+                    </div>
+                `;
+                
+                upcomingBillsContainer.appendChild(billElement);
+            });
+            
+            // Update summary stats
+            document.getElementById('totalOutstanding').textContent = 
+                upcomingBills.reduce((total, bill) => total + Number(bill.jumlah), 0);
+            
+            // Count bills due this week
+            const today = new Date();
+            const thisWeekEnd = new Date();
+            thisWeekEnd.setDate(today.getDate() + 7);
+            
+            const billsThisWeek = upcomingBills.filter(bill => 
+                new Date(bill.jatuhTempo) <= thisWeekEnd
+            ).length;
+            
+            document.getElementById('billsThisWeek').textContent = billsThisWeek;
+        }
+        
+        // Function to render recent payments
+        function renderRecentPayments() {
+            const recentPaymentsContainer = document.getElementById('recentPayments');
+            recentPaymentsContainer.innerHTML = '';
+            
+            // Filter paid bills and sort by due date descending
+            const paidBills = bills.filter(bill => bill.status === 'Sudah Dibayar')
+                .sort((a, b) => new Date(b.jatuhTempo) - new Date(a.jatuhTempo))
+                .slice(0, 3); // Show only the 3 most recent payments
+            
+            if (paidBills.length === 0) {
+                recentPaymentsContainer.innerHTML = '<p class="text-center">Tidak ada pembayaran terbaru.</p>';
+                return;
+            }
+            
+            paidBills.forEach(bill => {
+                const paymentElement = document.createElement('div');
+                paymentElement.classList.add('payment-item');
+                
+                paymentElement.innerHTML = `
+                    <div class="payment-info">
+                        <h6>${bill.nama}</h6>
+                        <p class="mb-0">Dibayar pada: ${new Date(bill.jatuhTempo).toLocaleDateString('id-ID')}</p>
+                    </div>
+                    <div class="payment-amount">
+                        <h6>Rp ${bill.jumlah}</h6>
+                        <span class="badge bg-success">Sudah Dibayar</span>
+                    </div>
+                `;
+                
+                recentPaymentsContainer.appendChild(paymentElement);
+            });
+        }
+        
+        // Function to calculate total wallet balance and render wallets
+        function renderWallets() {
+            const walletsListContainer = document.getElementById('walletsList');
+            walletsListContainer.innerHTML = '';
+            
+            const totalBalance = wallets.reduce((total, wallet) => total + Number(wallet.balance), 0);
+            document.getElementById('totalWalletBalance').textContent = totalBalance;
+            
+            if (wallets.length === 0) {
+                walletsListContainer.innerHTML = '<p class="text-center">Tidak ada dompet yang ditambahkan.</p>';
+                return;
+            }
+            
+            wallets.forEach(wallet => {
+                const walletElement = document.createElement('div');
+                walletElement.classList.add('wallet-item');
+                
+                walletElement.innerHTML = `
+                    <div class="wallet-info">
+                        <h6>${wallet.name}</h6>
+                        <p class="mb-0">${wallet.description}</p>
+                    </div>
+                    <div class="wallet-amount">
+                        <h6>Rp ${wallet.balance}</h6>
+                    </div>
+                `;
+                
+                walletsListContainer.appendChild(walletElement);
+            });
+        }
+        
+        // Function to render notifications
+        function renderNotifications() {
+            // This function is kept for consistency, but the actual notification rendering is handled in notifications.html
+            const notificationsContainer = document.getElementById('notificationsList');
+            notificationsContainer.innerHTML = '';
+            
+            // Filter bills that are due within 3 days and not marked as read
+            const today = new Date();
+            const threeDaysFromNow = new Date();
+            threeDaysFromNow.setDate(today.getDate() + 3);
+            
+            const notifications = bills.filter(bill => 
+                bill.status !== 'Sudah Dibayar' && 
+                new Date(bill.jatuhTempo) <= threeDaysFromNow && 
+                !bill.readNotification
+            );
+            
+            if (notifications.length === 0) {
+                document.getElementById('notificationCount').textContent = '0';
+                document.getElementById('notificationCount').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('notificationCount').textContent = notifications.length;
+            document.getElementById('notificationCount').style.display = 'flex';
+        }
+        
+        // Render dashboard content on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            renderUpcomingBills();
+            renderRecentPayments();
+            renderWallets();
+            renderNotifications();
+        });
+    </script>
+</body>
+</html>
