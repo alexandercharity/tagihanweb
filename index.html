@@ -1,0 +1,586 @@
+<!DOCTYPE
+html >
+  <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bills Reminder - Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+    html, body {
+            height: 100%;
+            margin: 0;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar {
+            background-color: #0d6efd;
+            padding: 10px 20px;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 20px 0;
+        }
+        
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .form-container .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .error-text {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: #dc3545;
+        }
+        
+        .requirements {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0b5ed7;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .link a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            background-color: #0d6efd;
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        
+        .container-footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Verification code input styles */
+        .verification-code-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .verification-code-input {
+            width: 40px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        
+        .verification-code-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            outline: none;
+        }
+        
+        .resend-code {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .resend-code a {
+            color: #0d6efd;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .resend-code a:hover {
+            text-decoration: underline;
+        }
+        
+        .countdown {
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Bootstrap with login/register buttons -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Bills Reminder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-outline-light me-2" onclick="showLoginForm()">Masuk</button>
+                    <button class="btn btn-light" onclick="showRegisterForm()">Daftar</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-form" class="form-container">
+            <div class="title">Login to your account</div>
+            
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" class="form-control" id="login-email" placeholder="Enter your email" onblur="validateEmail('login-email', 'login-email-error')">
+                <div class="error-text" id="login-email-error">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" class="form-control" id="login-password" placeholder="Enter your password" onblur="validatePassword('login-password', 'login-password-error')">
+                <div class="error-text" id="login-password-error">Password must be at least 8 characters with 1 uppercase letter</div>
+            </div>
+            
+            <button id="login-button" onclick="handleLogin()">Login</button>
+            
+            <div class="link">
+                Don't have an account? <a href="#" onclick="showRegisterForm()">Register</a>
+            </div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="register-form" class="form-container" style="display: none;">
+            <div class="title">Create an account</div>
+            
+            <div class="form-group">
+                <label for="register-name">Full Name</label>
+                <input type="text" class="form-control" id="register-name" placeholder="Enter your full name" onblur="validateName()">
+                <div class="error-text" id="register-name-error">Please enter your name</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" class="form-control" id="register-email" placeholder="Enter your email" onblur="validateEmail('register-email', 'register-email-error')">
+                <div class="error-text" id="register-email-error">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" class="form-control" id="register-password" placeholder="Enter your password" onblur="validatePassword('register-password', 'register-password-error')" oninput="checkPasswordMatch()">
+                <div class="error-text" id="register-password-error">Password must be at least 8 characters with 1 uppercase letter</div>
+                <div class="requirements">Must be at least 8 characters with 1 uppercase letter</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-confirm-password">Confirm Password</label>
+                <input type="password" class="form-control" id="register-confirm-password" placeholder="Confirm your password" oninput="checkPasswordMatch()">
+                <div class="error-text" id="password-match-error">Passwords do not match</div>
+            </div>
+            
+            <button id="register-button" onclick="handleRegister()">Register</button>
+            
+            <div class="link">
+                Already have an account? <a href="#" onclick="showLoginForm()">Login</a>
+            </div>
+        </div>
+        
+        <!-- Verification Form -->
+        <div id="verification-form" class="form-container" style="display: none;">
+            <div class="title">Email Verification</div>
+            
+            <p class="text-center mb-4">We've sent a 6-digit verification code to your email. Please enter the code below to verify your account.</p>
+            
+            <div class="verification-code-container">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-1" oninput="handleCodeInput(this, 'code-2', null)">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-2" oninput="handleCodeInput(this, 'code-3', 'code-1')">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-3" oninput="handleCodeInput(this, 'code-4', 'code-2')">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-4" oninput="handleCodeInput(this, 'code-5', 'code-3')">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-5" oninput="handleCodeInput(this, 'code-6', 'code-4')">
+                <input type="text" maxlength="1" class="verification-code-input" id="code-6" oninput="handleCodeInput(this, null, 'code-5')">
+            </div>
+            
+            <div class="error-text text-center" id="verification-error" style="display: none;">Invalid verification code. Please try again.</div>
+            
+            <button id="verify-button" onclick="verifyCode()">Verify</button>
+            
+            <div class="resend-code">
+                <span id="countdown-text" class="countdown">Resend code in <span id="countdown">60</span> seconds</span>
+                <a href="#" id="resend-link" style="display: none;" onclick="resendVerificationCode()">Resend verification code</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-footer">
+            <h5>Hubungi Kami :</h5>
+            <p>
+                <i class="fas fa-phone"></i> +62 82164642828 (WhatsApp Only)<br>
+                <i class="fas fa-envelope"></i> support@billreminder.id<br>
+                <i class="fas fa-map-marker-alt"></i> UNIVERSITAS PELITA HARAPAN<br>
+                Lippo Plaza Medan, Jl. Imam Bonjol No.6 Lantai 5 - 7, Petisah Tengah, Medan Petisah, Medan City, North Sumatra 20112
+            </p>
+            <p>
+                <a href="https://wa.me/6282164642828" class="footer-link" target="_blank" rel="noreferrer">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Global variables
+        let verificationCode = "";
+        let userEmail = "";
+        let isLogin = false;
+        let countdownInterval;
+        
+        // Name validation
+        function validateName() {
+            const nameInput = document.getElementById('register-name');
+            const nameError = document.getElementById('register-name-error');
+            
+            if (!nameInput.value.trim()) {
+                nameInput.classList.add('input-error');
+                nameError.style.display = 'block';
+                return false;
+            } else {
+                nameInput.classList.remove('input-error');
+                nameError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Email validation using regex
+        function validateEmail(inputId, errorId) {
+            const emailInput = document.getElementById(inputId);
+            const emailError = document.getElementById(errorId);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailInput.value.trim() || !emailRegex.test(emailInput.value)) {
+                emailInput.classList.add('input-error');
+                emailError.style.display = 'block';
+                return false;
+            } else {
+                emailInput.classList.remove('input-error');
+                emailError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Password validation (min 8 chars with at least 1 uppercase)
+        function validatePassword(inputId, errorId) {
+            const passwordInput = document.getElementById(inputId);
+            const passwordError = document.getElementById(errorId);
+            const passwordRegex = /^(?=.*[A-Z]).{8,}$/;
+            
+            if (!passwordInput.value.trim() || !passwordRegex.test(passwordInput.value)) {
+                passwordInput.classList.add('input-error');
+                passwordError.style.display = 'block';
+                return false;
+            } else {
+                passwordInput.classList.remove('input-error');
+                passwordError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Check if passwords match
+        function checkPasswordMatch() {
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const matchError = document.getElementById('password-match-error');
+            
+            if (!confirmPassword.trim()) {
+                document.getElementById('register-confirm-password').classList.add('input-error');
+                matchError.style.display = 'none';
+                return false;
+            } else if (password !== confirmPassword) {
+                document.getElementById('register-confirm-password').classList.add('input-error');
+                matchError.style.display = 'block';
+                return false;
+            } else {
+                document.getElementById('register-confirm-password').classList.remove('input-error');
+                matchError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Generate a random 6-digit verification code
+        function generateVerificationCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        // Send verification code to email (simulated)
+        function sendVerificationCode(email, code) {
+            console.log(`Sending verification code ${code} to ${email}`);
+            // In a real application, this would make an API call to send an email
+            // For this demo, we'll just simulate it
+            
+            // Start countdown for resend button
+            startCountdown();
+            
+            // For demo purposes, alert the code (in a real app, this would be sent via email)
+            setTimeout(() => {
+                alert(`Your verification code is: ${code}\n(In a real app, this would be sent to your email: ${email})`);
+            }, 1000);
+        }
+        
+        // Start countdown for resend button
+        function startCountdown() {
+            let seconds = 60;
+            const countdownElement = document.getElementById('countdown');
+            const countdownText = document.getElementById('countdown-text');
+            const resendLink = document.getElementById('resend-link');
+            
+            countdownText.style.display = 'inline';
+            resendLink.style.display = 'none';
+            countdownElement.textContent = seconds;
+            
+            clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownText.style.display = 'none';
+                    resendLink.style.display = 'inline';
+                }
+            }, 1000);
+        }
+        
+        // Resend verification code
+        function resendVerificationCode() {
+            verificationCode = generateVerificationCode();
+            sendVerificationCode(userEmail, verificationCode);
+        }
+        
+        // Handle code input - improved version
+        function handleCodeInput(currentInput, nextInputId, prevInputId) {
+            // Move to next input if current is filled
+            if (currentInput.value.length === 1 && nextInputId) {
+                document.getElementById(nextInputId).focus();
+            }
+            
+            // Handle backspace
+            if (currentInput.value.length === 0 && prevInputId && event.inputType === 'deleteContentBackward') {
+                document.getElementById(prevInputId).focus();
+            }
+            
+            // Check if all fields are filled
+            checkVerificationComplete();
+        }
+        
+        // Check if all verification code fields are filled
+        function checkVerificationComplete() {
+            const inputs = document.querySelectorAll('.verification-code-input');
+            let isFilled = true;
+            
+            inputs.forEach(input => {
+                if (!input.value) {
+                    isFilled = false;
+                }
+            });
+            
+            // Enable the verify button only if all fields are filled
+            document.getElementById('verify-button').disabled = !isFilled;
+        }
+        
+        // Verify the entered code
+        function verifyCode() {
+            const inputs = document.querySelectorAll('.verification-code-input');
+            let enteredCode = '';
+            
+            inputs.forEach(input => {
+                enteredCode += input.value;
+            });
+            
+            // Check if the code is complete
+            if (enteredCode.length !== 6) {
+                document.getElementById('verification-error').textContent = 'Please enter all 6 digits of the verification code.';
+                document.getElementById('verification-error').style.display = 'block';
+                return;
+            }
+            
+            // Check if the entered code matches the generated code
+            if (enteredCode === verificationCode) {
+                // Code is correct
+                document.getElementById('verification-error').style.display = 'none';
+                
+                // Redirect to dashboard after verification
+                window.location.href = "dashboard.html";
+            } else {
+                // Code is incorrect
+                document.getElementById('verification-error').textContent = 'Invalid verification code. Please try again.';
+                document.getElementById('verification-error').style.display = 'block';
+            }
+        }
+        
+        // Reset verification form
+        function resetVerificationForm() {
+            const inputs = document.querySelectorAll('.verification-code-input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            document.getElementById('verification-error').style.display = 'none';
+            document.getElementById('verify-button').disabled = true;
+            
+            clearInterval(countdownInterval);
+            document.getElementById('countdown-text').style.display = 'inline';
+            document.getElementById('resend-link').style.display = 'none';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('verification-form').style.display = 'none';
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('verification-form').style.display = 'none';
+        }
+        
+        function showVerificationForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('verification-form').style.display = 'block';
+            
+            // Focus on first input
+            document.getElementById('code-1').focus();
+        }
+        
+        function handleLogin() {
+            const emailValid = validateEmail('login-email', 'login-email-error');
+            const passwordValid = validatePassword('login-password', 'login-password-error');
+            
+            if (!emailValid || !passwordValid) {
+                return;
+            }
+            
+            // Set global variables
+            userEmail = document.getElementById('login-email').value;
+            isLogin = true;
+            
+            // Generate and send verification code
+            verificationCode = generateVerificationCode();
+            sendVerificationCode(userEmail, verificationCode);
+            
+            // Show verification form
+            resetVerificationForm();
+            showVerificationForm();
+        }
+        
+        function handleRegister() {
+            const nameValid = validateName();
+            const emailValid = validateEmail('register-email', 'register-email-error');
+            const passwordValid = validatePassword('register-password', 'register-password-error');
+            const passwordsMatch = checkPasswordMatch();
+            
+            if (!nameValid || !emailValid || !passwordValid || !passwordsMatch) {
+                return;
+            }
+            
+            // Set global variables
+            userEmail = document.getElementById('register-email').value;
+            isLogin = false;
+            
+            // Generate and send verification code
+            verificationCode = generateVerificationCode();
+            sendVerificationCode(userEmail, verificationCode);
+            
+            // Show verification form
+            resetVerificationForm();
+            showVerificationForm();
+        }
+
+        // Initialize the verification form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make sure the verify button is initially disabled
+            const verifyButton = document.getElementById('verify-button');
+            if (verifyButton) {
+                verifyButton.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
