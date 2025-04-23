@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE
+html >
+  <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -144,7 +145,7 @@
                 Lippo Plaza Medan, Jl. Imam Bonjol No.6 Lantai 5 - 7, Petisah Tengah, Medan Petisah, Medan City, North Sumatra 20112
             </p>
             <p>
-                <a href="https://wa.me/6282164642828" class="footer-link" target="_blank">
+                <a href="https://wa.me/6282164642828" class="footer-link" target="_blank" rel="noreferrer">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
             </p>
@@ -194,6 +195,11 @@
         let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
         let currentEditIndex = -1;
 
+        // Function to format currency in Indonesian format
+        function formatCurrency(amount) {
+            return Number(amount).toLocaleString('id-ID');
+        }
+
         // Function to render wallets
         function renderWallets() {
             const walletsList = document.getElementById('walletsList');
@@ -211,7 +217,7 @@
                             <p class="text-muted mb-0">Added: ${new Date(wallet.dateAdded).toLocaleDateString('id-ID')}</p>
                         </div>
                         <div class="col-md-4 text-md-end">
-                            <h5>Rp ${wallet.balance}</h5>
+                            <h5>Rp ${formatCurrency(wallet.balance)}</h5>
                             <div class="mt-3">
                                 <button class="btn btn-sm btn-outline-secondary action-btn" onclick="showEditWalletModal(${index})">Edit</button>
                                 <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteWallet(${index})">Delete</button>
