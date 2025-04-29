@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE
+html >
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom CSS -->
     <style>
-        html, body {
+    html, body {
             height: 100%;
             margin: 0;
         }
@@ -281,6 +282,24 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <h5>Hubungi Kami :</h5>
+            <p>
+                <i class="fas fa-phone"></i> +62 82164642828 (WhatsApp Only)<br>
+                <i class="fas fa-envelope"></i> support@billreminder.id<br>
+                <i class="fas fa-map-marker-alt"></i> UNIVERSITAS PELITA HARAPAN<br>
+                Lippo Plaza Medan, Jl. Imam Bonjol No.6 Lantai 5 - 7, Petisah Tengah, Medan Petisah, Medan City, North Sumatra 20112
+            </p>
+            <p>
+                <a href="https://wa.me/6282164642828" class="footer-link" target="_blank">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </p>
+        </div>
+    </footer>
+
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
@@ -518,30 +537,17 @@
                 return;
             }
             
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            // Set global variables
+            userEmail = document.getElementById('login-email').value;
+            isLogin = true;
             
-            // Send request to server
-            fetch('auth.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'login',
-                    email: email,
-                    password: password
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+            // Generate and send verification code
+            verificationCode = generateVerificationCode();
+            sendVerificationCode(userEmail, verificationCode);
+            
+            // Show verification form
+            resetVerificationForm();
+            showVerificationForm();
         }
         
         function handleRegister() {
@@ -554,39 +560,17 @@
                 return;
             }
             
-            const name = document.getElementById('register-name').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
+            // Set global variables
+            userEmail = document.getElementById('register-email').value;
+            isLogin = false;
             
-            // Send request to server
-            fetch('auth.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'register',
-                    name: name,
-                    email: email,
-                    password: password
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Registration successful! Please verify your email.');
-                    // Simulate verification code sending
-                    verificationCode = generateVerificationCode();
-                    sendVerificationCode(email, verificationCode);
-                    
-                    // Show verification form
-                    resetVerificationForm();
-                    showVerificationForm();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+            // Generate and send verification code
+            verificationCode = generateVerificationCode();
+            sendVerificationCode(userEmail, verificationCode);
+            
+            // Show verification form
+            resetVerificationForm();
+            showVerificationForm();
         }
 
         // Initialize the verification form
