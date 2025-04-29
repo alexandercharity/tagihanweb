@@ -142,6 +142,11 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="profile-picture" class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control" id="profile-picture">
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="profile-password" class="form-label">Change Password</label>
                         <input type="password" class="form-control" id="profile-password">
                     </div>
@@ -184,9 +189,9 @@
     <script>
         // Load profile data from localStorage
         const profileData = JSON.parse(localStorage.getItem('profile')) || {
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            phone: '+62 82164642828',
+            name: 'Erick Ganteng',
+            email: 'erikganteng123@gmail.com',
+            phone: '+62 8215214137',
             address: 'Lippo Plaza Medan, Jl. Imam Bonjol No.6 Lantai 5 - 7, Petisah Tengah, Medan Petisah, Medan City, North Sumatra 20112',
             picture: null
         };
