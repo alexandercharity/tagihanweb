@@ -99,6 +99,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="profile.html">Profile</a>
                     </li>
+                    <li class="nav-item">
+                        <button class="btn btn-danger" onclick="handleLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -233,6 +238,18 @@
             alert('Profile updated successfully!');
             window.location.href = 'dashboard.html';
         });
+
+        // Fungsi logout
+        function handleLogout() {
+            // Hapus data profil dari localStorage atau sessionStorage
+            localStorage.removeItem('profile');
+            
+            // Redirect ke halaman login
+            window.location.href = 'index.html';
+            
+            // Tampilkan notifikasi logout
+            alert('Logout successful!');
+        }
     </script>
 </body>
 </html>
