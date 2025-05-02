@@ -73,7 +73,7 @@
                             Tagihan
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="tagihanDropdown">
-                            <li><a class="dropdown-item" href="tambahtagihan.html">Tambah Tagihan</a></li>
+                            <li><a class="dropdown-item" href="tambah-tagihan.html">Tambah Tagihan</a></li>
                             <li><a class="dropdown-item" href="daftar-tagihan.html">Daftar Tagihan</a></li>
                             <li><a class="dropdown-item" href="kalendertagihan.html">Kalender Tagihan</a></li>
                         </ul>
@@ -128,6 +128,11 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="wallet-name" class="form-label">Wallet Name</label>
+                        <input type="text" class="form-control" id="wallet-name" required>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="expense-amount" class="form-label">Amount (Rp)</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
@@ -162,6 +167,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Wallet Name</th>
                                 <th>Date</th>
                                 <th>Category</th>
                                 <th>Amount</th>
@@ -200,6 +206,37 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
+        // Function to check if a wallet exists
+        function walletExists(walletName) {
+            const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+            return wallets.some(wallet => wallet.name.toLowerCase() === walletName.toLowerCase());
+        }
+
+        // Function to add wallet if it doesn't exist
+        function addWalletIfNotExist(walletName) {
+            if (!walletExists(walletName)) {
+                let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+                wallets.push({
+                    name: walletName,
+                    balance: '0',
+                    description: '',
+                    dateAdded: new Date().toISOString()
+                });
+                localStorage.setItem('wallets', JSON.stringify(wallets));
+            }
+        }
+
+        // Function to update wallet balance
+        function updateWalletBalance(walletName, amount) {
+            let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+            const walletIndex = wallets.findIndex(wallet => wallet.name.toLowerCase() === walletName.toLowerCase());
+            
+            if (walletIndex !== -1) {
+                wallets[walletIndex].balance = (parseInt(wallets[walletIndex].balance) - parseInt(amount)).toString();
+                localStorage.setItem('wallets', JSON.stringify(wallets));
+            }
+        }
+
         // Function to load expenses from localStorage and display them
         function loadExpenses() {
             const expensesTableBody = document.getElementById('expenses-table-body');
@@ -208,13 +245,14 @@
             const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
             
             if (expenses.length === 0) {
-                expensesTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No expenses recorded yet.</td></tr>';
+                expensesTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No expenses recorded yet.</td></tr>';
                 return;
             }
             
             expenses.forEach((expense, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>${expense.walletName}</td>
                     <td>${new Date(expense.date).toLocaleDateString()}</td>
                     <td>${expense.category}</td>
                     <td>Rp ${expense.amount}</td>
@@ -239,6 +277,7 @@
                 const expense = expenses[index];
                 document.getElementById('expense-id').value = index;
                 document.getElementById('expense-category').value = expense.category;
+                document.getElementById('wallet-name').value = expense.walletName;
                 document.getElementById('expense-amount').value = expense.amount;
                 document.getElementById('expense-date').value = expense.date;
                 document.getElementById('expense-description').value = expense.description;
@@ -264,16 +303,22 @@
             
             const expenseId = document.getElementById('expense-id').value;
             const expenseCategory = document.getElementById('expense-category').value;
+            const walletName = document.getElementById('wallet-name').value;
             const expenseAmount = document.getElementById('expense-amount').value;
             const expenseDate = document.getElementById('expense-date').value;
             const expenseDescription = document.getElementById('expense-description').value;
             
             let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
             
+            // Add wallet if it doesn't exist and update balance
+            addWalletIfNotExist(walletName);
+            updateWalletBalance(walletName, expenseAmount);
+            
             if (expenseId) {
                 // Edit existing expense
                 expenses[expenseId] = {
                     category: expenseCategory,
+                    walletName: walletName,
                     amount: expenseAmount,
                     date: expenseDate,
                     description: expenseDescription,
@@ -283,6 +328,7 @@
                 // Add new expense
                 expenses.push({
                     category: expenseCategory,
+                    walletName: walletName,
                     amount: expenseAmount,
                     date: expenseDate,
                     description: expenseDescription,
@@ -298,7 +344,7 @@
             loadExpenses();
         });
         
-        // Load expenses when page loads
+        // Load expenses when the page loads
         document.addEventListener('DOMContentLoaded', loadExpenses);
     </script>
 </body>
