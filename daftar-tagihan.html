@@ -30,6 +30,20 @@
         .navbar {
             background-color: #0d6efd;
             padding: 10px 20px;
+            margin-bottom: 20px;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+        }
+        
+        .nav-link {
+            color: white !important;
+            margin-right: 20px;
+        }
+        
+        .nav-link:hover {
+            color: #e0e0e0 !important;
         }
         
         .card {
@@ -101,6 +115,15 @@
             margin-bottom: 5px;
         }
         
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .pagination .page-item.disabled {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .bill-card .row {
                 flex-direction: column;
@@ -122,44 +145,13 @@
     <!-- Navbar Bootstrap -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.html">Bills Reminder</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="tagihanDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Tagihan
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="tagihanDropdown">
-                            <li><a class="dropdown-item" href="tambah-tagihan.html">Tambah Tagihan</a></li>
-                            <li><a class="dropdown-item" href="daftar-tagihan.html">Daftar Tagihan</a></li>
-                            <li><a class="dropdown-item" href="kalendertagihan.html">Kalender Tagihan</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="keuanganDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Keuangan
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="keuanganDropdown">
-                            <li><a class="dropdown-item" href="add-wallet.html">Add Wallet</a></li>
-                            <li><a class="dropdown-item" href="wallets.html">My Wallets</a></li>
-                            <li><a class="dropdown-item" href="pemasukan.html">Pemasukan</a></li>
-                            <li><a class="dropdown-item" href="pengeluaran.html">Pengeluaran</a></li>
-                            <li><a class="dropdown-item" href="grafik-statistik.html">Grafik & Statistik</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="customer-service.html">Customer Service</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" title="Notifikasi"><i class="fas fa-bell"></i></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="profile.html">Profile</a>
-                    </li>
-                </ul>
+            <a class="navbar-brand ms-5" href="dashboard.html">Bills Reminder</a>
+            <div class="d-flex justify-content-end me-5">
+                <a class="nav-link" href="tambah-tagihan.html">Tagihan</a>
+                <a class="nav-link" href="pemasukan.html">Keuangan</a>
+                <a class="nav-link" href="customer-service.html">Customer Service</a>
+                <a class="nav-link" href="#" title="Notifikasi"><i class="fas fa-bell"></i></a>
+                <a class="nav-link" href="profile.html">Profile</a>
             </div>
         </div>
     </nav>
@@ -222,16 +214,20 @@
         </div>
         
         <!-- Pagination -->
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+        <nav aria-label="Page navigation" class="mt-4" id="paginationNav">
+            <ul class="pagination" id="pagination">
+                <li class="page-item" id="prevPage">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">Previous</span>
+                    </a>
                 </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
+                <li class="page-item active" id="page1"><a class="page-link" href="#">1</a></li>
+                <li class="page-item" id="page2"><a class="page-link" href="#">2</a></li>
+                <li class="page-item" id="page3"><a class="page-link" href="#">3</a></li>
+                <li class="page-item" id="nextPage">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">Next</span>
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -321,13 +317,24 @@
         // Load bills from localStorage
         let bills = JSON.parse(localStorage.getItem('bills')) || [];
         let currentEditIndex = -1;
+        let currentPage = 1;
+        const billsPerPage = 5;
 
-        // Function to render bills
-        function renderBills(bills) {
+        // Function to render bills with pagination
+        function renderBills() {
             const billsList = document.getElementById('billsList');
             billsList.innerHTML = '';
             
-            bills.forEach((bill, index) => {
+            const startIndex = (currentPage - 1) * billsPerPage;
+            const endIndex = Math.min(startIndex + billsPerPage, bills.length);
+            const currentBills = bills.slice(startIndex, endIndex);
+            
+            if (currentBills.length === 0) {
+                billsList.innerHTML = '<div class="text-center">Tidak ada tagihan yang ditampilkan.</div>';
+                return;
+            }
+            
+            currentBills.forEach((bill, index) => {
                 const billCard = document.createElement('div');
                 billCard.classList.add('bill-card', bill.status === 'Sudah Dibayar' ? 'paid' : bill.status === 'Terlambat' ? 'overdue' : 'due-soon');
                 
@@ -343,9 +350,9 @@
                             <h5>Rp ${bill.jumlah}</h5>
                             <span class="badge bg-${bill.status === 'Sudah Dibayar' ? 'success' : bill.status === 'Terlambat' ? 'danger' : 'primary'} mb-2">${bill.status}</span>
                             <div class="mt-3">
-                                <button class="btn btn-sm btn-primary action-btn">Bayar Sekarang</button>
-                                <button class="btn btn-sm btn-outline-secondary action-btn" onclick="showEditModal(${index})">Edit</button>
-                                <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteBill(${index})">Hapus</button>
+                                <button class="btn btn-sm btn-primary action-btn" onclick="payBill(${startIndex + index})">Bayar Sekarang</button>
+                                <button class="btn btn-sm btn-outline-secondary action-btn" onclick="showEditModal(${startIndex + index})">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteBill(${startIndex + index})">Hapus</button>
                             </div>
                         </div>
                     </div>
@@ -353,6 +360,63 @@
                 
                 billsList.appendChild(billCard);
             });
+            
+            // Update pagination
+            updatePagination();
+        }
+        
+        // Function to update pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(bills.length / billsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            // Clear existing pagination items
+            while (pagination.children.length > 0) {
+                pagination.removeChild(pagination.firstChild);
+            }
+            
+            // Add Previous button
+            const prevButton = document.createElement('li');
+            prevButton.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevButton.innerHTML = `
+                <a class="page-link" href="#" aria-label="Previous" onclick="changePage(${currentPage - 1})">
+                    <span aria-hidden="true">Previous</span>
+                </a>
+            `;
+            pagination.appendChild(prevButton);
+            
+            // Add page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageItem.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+                pagination.appendChild(pageItem);
+            }
+            
+            // Add Next button
+            const nextButton = document.createElement('li');
+            nextButton.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextButton.innerHTML = `
+                <a class="page-link" href="#" aria-label="Next" onclick="changePage(${currentPage + 1})">
+                    <span aria-hidden="true">Next</span>
+                </a>
+            `;
+            pagination.appendChild(nextButton);
+            
+            // Hide pagination if there's only one page
+            if (totalPages <= 1) {
+                document.getElementById('paginationNav').style.display = 'none';
+            } else {
+                document.getElementById('paginationNav').style.display = 'block';
+            }
+        }
+        
+        // Function to change page
+        function changePage(page) {
+            if (page >= 1 && page <= Math.ceil(bills.length / billsPerPage)) {
+                currentPage = page;
+                renderBills();
+            }
         }
         
         // Function to delete a bill
@@ -360,7 +424,8 @@
             if (confirm('Anda yakin ingin menghapus tagihan ini?')) {
                 bills.splice(index, 1);
                 localStorage.setItem('bills', JSON.stringify(bills));
-                renderBills(bills);
+                currentPage = 1;
+                renderBills();
             }
         }
         
@@ -401,12 +466,28 @@
             const modalInstance = bootstrap.Modal.getInstance(editModal);
             modalInstance.hide();
             
-            renderBills(bills);
+            renderBills();
             alert('Tagihan berhasil diperbarui!');
         }
         
+        // Function to pay a bill
+        function payBill(index) {
+            if (confirm('Anda yakin ingin membayar tagihan ini?')) {
+                bills[index].status = 'Sudah Dibayar';
+                localStorage.setItem('bills', JSON.stringify(bills));
+                renderBills();
+                alert('Tagihan berhasil dibayar!');
+            }
+        }
+        
+        // Function to add a new bill
+        function addNewBill() {
+            // This function would handle adding a new bill from another page (tambah-tagihan.html)
+            // It's assumed that the new bill is added to the bills array and saved to localStorage
+        }
+        
         // Render bills on page load
-        renderBills(bills);
+        renderBills();
     </script>
 </body>
 </html>
