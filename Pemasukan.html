@@ -73,7 +73,7 @@
                             Tagihan
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="tagihanDropdown">
-                            <li><a class="dropdown-item" href="tambahtagihan.html">Tambah Tagihan</a></li>
+                            <li><a class="dropdown-item" href="tambah-tagihan.html">Tambah Tagihan</a></li>
                             <li><a class="dropdown-item" href="daftar-tagihan.html">Daftar Tagihan</a></li>
                             <li><a class="dropdown-item" href="kalendertagihan.html">Kalender Tagihan</a></li>
                         </ul>
@@ -128,6 +128,11 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="wallet-name" class="form-label">Wallet Name</label>
+                        <input type="text" class="form-control" id="wallet-name" required>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="income-amount" class="form-label">Amount (Rp)</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
@@ -162,6 +167,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Wallet Name</th>
                                 <th>Date</th>
                                 <th>Source</th>
                                 <th>Amount</th>
@@ -200,6 +206,37 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
+        // Function to check if a wallet exists
+        function walletExists(walletName) {
+            const wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+            return wallets.some(wallet => wallet.name.toLowerCase() === walletName.toLowerCase());
+        }
+
+        // Function to add wallet if it doesn't exist
+        function addWalletIfNotExist(walletName) {
+            if (!walletExists(walletName)) {
+                let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+                wallets.push({
+                    name: walletName,
+                    balance: '0',
+                    description: '',
+                    dateAdded: new Date().toISOString()
+                });
+                localStorage.setItem('wallets', JSON.stringify(wallets));
+            }
+        }
+
+        // Function to update wallet balance
+        function updateWalletBalance(walletName, amount) {
+            let wallets = JSON.parse(localStorage.getItem('wallets')) || [];
+            const walletIndex = wallets.findIndex(wallet => wallet.name.toLowerCase() === walletName.toLowerCase());
+            
+            if (walletIndex !== -1) {
+                wallets[walletIndex].balance = (parseInt(wallets[walletIndex].balance) + parseInt(amount)).toString();
+                localStorage.setItem('wallets', JSON.stringify(wallets));
+            }
+        }
+
         // Function to load incomes from localStorage and display them
         function loadIncomes() {
             const incomesTableBody = document.getElementById('incomes-table-body');
@@ -208,13 +245,14 @@
             const incomes = JSON.parse(localStorage.getItem('incomes')) || [];
             
             if (incomes.length === 0) {
-                incomesTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No incomes recorded yet.</td></tr>';
+                incomesTableBody.innerHTML = '<tr><td colspan="6" class="text-center">No incomes recorded yet.</td></tr>';
                 return;
             }
             
             incomes.forEach((income, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>${income.walletName}</td>
                     <td>${new Date(income.date).toLocaleDateString()}</td>
                     <td>${income.source}</td>
                     <td>Rp ${income.amount}</td>
@@ -239,6 +277,7 @@
                 const income = incomes[index];
                 document.getElementById('income-id').value = index;
                 document.getElementById('income-source').value = income.source;
+                document.getElementById('wallet-name').value = income.walletName;
                 document.getElementById('income-amount').value = income.amount;
                 document.getElementById('income-date').value = income.date;
                 document.getElementById('income-description').value = income.description;
@@ -264,16 +303,22 @@
             
             const incomeId = document.getElementById('income-id').value;
             const incomeSource = document.getElementById('income-source').value;
+            const walletName = document.getElementById('wallet-name').value;
             const incomeAmount = document.getElementById('income-amount').value;
             const incomeDate = document.getElementById('income-date').value;
             const incomeDescription = document.getElementById('income-description').value;
             
             let incomes = JSON.parse(localStorage.getItem('incomes')) || [];
             
+            // Add wallet if it doesn't exist and update balance
+            addWalletIfNotExist(walletName);
+            updateWalletBalance(walletName, incomeAmount);
+            
             if (incomeId) {
                 // Update existing income
                 incomes[incomeId] = {
                     source: incomeSource,
+                    walletName: walletName,
                     amount: incomeAmount,
                     date: incomeDate,
                     description: incomeDescription,
@@ -283,6 +328,7 @@
                 // Add new income
                 incomes.push({
                     source: incomeSource,
+                    walletName: walletName,
                     amount: incomeAmount,
                     date: incomeDate,
                     description: incomeDescription,
