@@ -332,9 +332,9 @@
             const upcomingBillsContainer = document.getElementById('upcomingBills');
             upcomingBillsContainer.innerHTML = '';
             
-            // Filter bills that are upcoming (not paid and due date is in the future)
+            // Filter bills that are unpaid and due date is in the future
             const upcomingBills = bills.filter(bill => 
-                bill.status !== 'Sudah Dibayar' && 
+                (bill.status === 'Belum Dibayar' || bill.status === 'Terlambat') && 
                 new Date(bill.jatuhTempo) >= new Date()
             ).sort((a, b) => new Date(a.jatuhTempo) - new Date(b.jatuhTempo));
             
@@ -461,7 +461,7 @@
             threeDaysFromNow.setDate(today.getDate() + 3);
             
             const notifications = bills.filter(bill => 
-                bill.status !== 'Sudah Dibayar' && 
+                (bill.status === 'Belum Dibayar' || bill.status === 'Terlambat') && 
                 new Date(bill.jatuhTempo) <= threeDaysFromNow && 
                 !bill.readNotification
             );
